@@ -102,7 +102,7 @@ router.put("/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-// Delete a specific subtask by ID
+//DELETE - /subtask/:id Delete a specific subtask by ID
 router.delete("/:id", isAuthenticated, async (req, res) => {
   try {
     const deletedSubtask = await Subtask.findByIdAndDelete(req.params.id);

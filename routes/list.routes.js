@@ -46,13 +46,13 @@ router.get("/", isAuthenticated, async (req, res) => {
   }
 });
 
-//GET - /list/:id - Get a specific list by ID
-router.get("/:id", isAuthenticated, async (req, res) => {
+//GET - /list/:listId - Get a specific list by ID
+router.get("/:listId", isAuthenticated, async (req, res) => {
     try {
       const userId = req.payload._id;
   
       // Find the list by ID and check if it belongs to the authenticated user
-      const list = await List.findById({ _id: req.params.id, user: userId }).populate("tasks");
+      const list = await List.findById({ _id: req.params.listId, user: userId }).populate("tasks");
       
       if (!list) {
         return res.status(404).json({ error: "List not found" });
@@ -65,14 +65,14 @@ router.get("/:id", isAuthenticated, async (req, res) => {
     }
   });
   
-  //PUT - /list/:id - Update a specific list by ID
-  router.put("/:id", isAuthenticated, async (req, res) => {
+  //PUT - /list/:listId - Update a specific list by ID
+  router.put("/:listId", isAuthenticated, async (req, res) => {
     try {
       const userId = req.payload._id;
   
       // Find the list by ID and check if it belongs to the authenticated user
       const updatedList = await List.findByIdAndUpdate(
-        { _id: req.params.id, user: userId },
+        { _id: req.params.listId, user: userId },
         req.body,
         { new: true }
       );
@@ -88,13 +88,13 @@ router.get("/:id", isAuthenticated, async (req, res) => {
     }
   });
   
- // DELETE - /list/:id - Delete a specific list by ID
-router.delete("/:id", isAuthenticated, async (req, res) => {
+ // DELETE - /list/:listId - Delete a specific list by ID
+router.delete("/:listId", isAuthenticated, async (req, res) => {
     try {
       const userId = req.payload._id;
   
       // Find the list by ID and check if it belongs to the authenticated user
-      const deletedList = await List.findByIdAndDelete({ _id: req.params.id, user: userId });
+      const deletedList = await List.findByIdAndDelete({ _id: req.params.listId, user: userId });
   
       if (!deletedList) {
         return res.status(404).json({ error: "List not found" });
@@ -103,7 +103,7 @@ router.delete("/:id", isAuthenticated, async (req, res) => {
       // Remove the reference to the deleted list from the user's lists
       await User.findByIdAndUpdate(
         userId,
-        { $pull: { list: req.params.id } },
+        { $pull: { list: req.params.listId } },
         { new: true }
       );
   
