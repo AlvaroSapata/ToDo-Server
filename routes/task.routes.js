@@ -62,8 +62,8 @@ router.get("/:listId", isAuthenticated, async (req, res) => {
   }
 });
 
-//GET - /task/:listId/:id -  Get a specific task by ID from a specific list
-router.get("/:listId/:id", isAuthenticated, async (req, res) => {
+//GET - /task/:listId/:taskid -  Get a specific task by ID from a specific list
+router.get("/:listId/:taskid", isAuthenticated, async (req, res) => {
   try {
     const userId = req.payload._id;
     const listId = req.params.listId;
@@ -78,7 +78,7 @@ router.get("/:listId/:id", isAuthenticated, async (req, res) => {
 
     // Find the specific task within the list's tasks
     const task = listWithTasks.tasks.find(
-      (task) => task._id.toString() === req.params.id
+      (task) => task._id.toString() === req.params.taskid
     );
 
     if (!task) {
@@ -91,11 +91,11 @@ router.get("/:listId/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-//PUT - /task/:id -  Update a specific task by ID
-router.put("/:id", isAuthenticated, async (req, res) => {
+//PUT - /task/:taskid -  Update a specific task by ID
+router.put("/:taskid", isAuthenticated, async (req, res) => {
     try {
       const userId = req.payload._id;
-      const taskId = req.params.id;
+      const taskId = req.params.taskid;
   
       // Check if the task exists and belongs to the user
       const task = await Task.findByIdAndUpdate({ _id: taskId, user: userId });
@@ -119,14 +119,14 @@ router.put("/:id", isAuthenticated, async (req, res) => {
   });
   
 
-// DELETE - /task/:id - Delete a specific task by ID
-router.delete("/:id", isAuthenticated, async (req, res) => {
+// DELETE - /task/:taskid - Delete a specific task by ID
+router.delete("/:taskid", isAuthenticated, async (req, res) => {
     try {
       const userId = req.payload._id;
   
       // Find the task by ID and check if it belongs to the authenticated user
       const deletedTask = await Task.findByIdAndDelete({
-        _id: req.params.id,
+        _id: req.params.taskid,
         user: userId,
       });
   
@@ -138,7 +138,7 @@ router.delete("/:id", isAuthenticated, async (req, res) => {
       const listId = deletedTask.list;
       await List.findByIdAndUpdate(
         listId,
-        { $pull: { tasks: req.params.id } },
+        { $pull: { tasks: req.params.taskid } },
         { new: true }
       );
   
