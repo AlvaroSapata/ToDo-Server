@@ -55,14 +55,15 @@ router.get("/:taskId", isAuthenticated, async (req, res) => {
   }
 });
 
-//GET - /subtask/:taskId/:id -  Get a specific subtask by ID from a specific task
-router.get("/:taskId/:id", isAuthenticated, async (req, res) => {
+//GET - /subtask/:taskId/:subtaskid -  Get a specific subtask by ID from a specific task
+router.get("/:taskId/:subtaskid", isAuthenticated, async (req, res) => {
   try {
     const userId = req.payload._id;
     const taskId = req.params.taskId;
 
     // Find List and populate the 'tasks' field
     const taskWithSubtasks = await Task.findById(taskId).populate("subtasks");
+    console.log(taskWithSubtasks);
 
     // Check if the task exists
     if (!taskWithSubtasks) {
@@ -71,11 +72,11 @@ router.get("/:taskId/:id", isAuthenticated, async (req, res) => {
 
     // Find the specific Subtask within the task's subtasks
     const subtask = taskWithSubtasks.subtasks.find(
-      (subtask) => subtask._id.toString() === req.params.id
+      (subtask) => subtask._id.toString() === req.params.subtaskid
     );
 
     if (!subtask) {
-      return res.status(404).json({ error: "Task not found" });
+      return res.status(404).json({ error: "Subtask not found" });
     }
     res.json(subtask);
   } catch (error) {
@@ -84,11 +85,11 @@ router.get("/:taskId/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-//PUT - /subtask/:id Update a specific subtask by ID
-router.put("/:id", isAuthenticated, async (req, res) => {
+//PUT - /subtask/:subtaskid Update a specific subtask by ID
+router.put("/:subtaskid", isAuthenticated, async (req, res) => {
   try {
     const updatedSubtask = await Subtask.findByIdAndUpdate(
-      req.params.id,
+      req.params.subtaskid,
       req.body,
       { new: true }
     );
@@ -102,10 +103,10 @@ router.put("/:id", isAuthenticated, async (req, res) => {
   }
 });
 
-//DELETE - /subtask/:id Delete a specific subtask by ID
-router.delete("/:id", isAuthenticated, async (req, res) => {
+//DELETE - /subtask/:subtaskid Delete a specific subtask by ID
+router.delete("/:subtaskid", isAuthenticated, async (req, res) => {
   try {
-    const deletedSubtask = await Subtask.findByIdAndDelete(req.params.id);
+    const deletedSubtask = await Subtask.findByIdAndDelete(req.params.subtaskid);
 
     if (!deletedSubtask) {
       return res.status(404).json({ error: "Subtask not found" });
@@ -115,7 +116,7 @@ router.delete("/:id", isAuthenticated, async (req, res) => {
     const taskId = deletedSubtask.task;
     await Task.findByIdAndUpdate(
       taskId,
-      { $pull: { subtasks: req.params.id } },
+      { $pull: { subtasks: req.params.subtaskid } },
       { new: true }
     );
 
